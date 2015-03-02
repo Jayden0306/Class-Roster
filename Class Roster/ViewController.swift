@@ -8,47 +8,48 @@
 
 import UIKit
 
-class ViewController: UIViewController {
-    //create a UILabel
-    @IBOutlet weak var displayText: UILabel!
-    
-    //create a array of names
-    var names = ["Joe", "Kevin", "Linda", "Mandy", "Nicky", "Orsca"]
-    //initialize a start index when display a name
-    var index = 2
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    var people = [Person]()
+    @IBOutlet weak var tableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        //dispaly a name in the UILabel
-        displayText.text = names[index]
+        // Do any additional setup after loading the view, typically from a nib
+        var apple = Person(firstName: "Apple", lastName: "Chen")
+        var brian = Person(firstName: "Brian", lastName: "Whinsky")
+        var cathy = Person(firstName: "Cathy", lastName: "Taylor")
+        var debby = Person(firstName: "Debby", lastName: "Rivera")
+        var eddit = Person(firstName: "Eddit", lastName: "Ho")
+        people += [apple, brian, cathy, debby, eddit]
         
+        self.tableView.dataSource = self
+        self.tableView.delegate = self
+        self.title = "Home"
+        
+    }
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "showPerson" {
+            let personDetailViewController = segue.destinationViewController as PersonDetailViewController
+            //asking the table view for the selected index path, because we need to know which row they clicked on
+            let selectedIndexPath = self.tableView.indexPathForSelectedRow()
+            //figures out which person they clicked on
+            let person = self.people[selectedIndexPath!.row]
+            //passing the person to our destination view controller
+            personDetailViewController.selectedPerson = person
+        }
     }
     
-    @IBAction func leftPressed(sender: AnyObject) {
-        //when left is pressed, index is decresing
-        index--
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.people.count
+    }
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
         
-        //re assign index to 0 if the index is less or equal to zero
-        if index == 0 || index < 0 {
-            index = 0
-            displayText.text = names[index]
-        } else {
-           displayText.text = names[index]
-        }
+        let person = self.people[indexPath.row]
+        
+        cell.textLabel?.text = person.firstName + " " + person.lastName
+        return cell
     }
-    @IBAction func rightPressed(sender: AnyObject) {
-        //when right is pressed, index is increasing
-        index++
-        let count = names.count-1
-        //re assign index to last index 
-        //when index is greater or equal to last index value
-        if index == count || index > count{
-            index = count
-            displayText.text = names[index]
-        } else {
-            displayText.text = names[index]
-        }
-    }
-}
+  }
 
